@@ -1,0 +1,85 @@
+version: '2'
+services:
+
+  namenode:
+    image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8
+    container_name: namenode
+    volumes:
+      - ./data/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50070:50070
+      - 8020:8020
+
+  datanode:
+    image: bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8
+    container_name: datanode
+    depends_on:
+      - namenode
+    volumes:
+      - ./data/datanode:/hadoop/dfs/data
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 50075:50075
+
+  spark-master:
+    build: ./master
+    image: spark-master
+    container_name: spark-master
+    ports:
+      - "18080:18080"
+      - "17077:17077"
+    env_file:
+      - ./hadoop.env
+    environment:
+      - NAMENODE_HOSTNAME=namenode
+      - "INIT_DAEMON_STEP=setup_spark"
+      - "constraint:node==spark-master"
+
+  spark-worker-1:
+    build: ./worker
+    image: spark-worker
+    container_name: spark-worker-1
+    depends_on:
+      - datanode
+      - namenode
+      - spark-master
+    ports:
+      - "18081:18081"
+    env_file:
+      - ./hadoop.env
+    environment:
+      - "NAMENODE_HOSTNAME=namenode"
+      - "SPARK_MASTER=spark://spark-master:17077"
+      - "constraint:node==spark-worker-1"
+
+  livy:
+    build: ./livy
+    image: livy
+    container_name: livy
+    depends_on:
+      - datanode
+      - namenode
+      - spark-master
+    ports:
+      - "8998:8998"
+    env_file:
+      - ./hadoop.env
+    environment:
+      - "NAMENODE_HOSTNAME=namenode"
+
+  spark-submit:
+    build: ./submit
+    image: spark-submit
+    container_name: spark-submit
+    env_file:
+      - ./hadoop.env
+    depends_on:
+      - datanode
+      - namenode
+      - spark-worker-1
+      - spark-master

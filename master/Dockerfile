@@ -1,0 +1,11 @@
+FROM bde2020/spark-base:2.3.1-hadoop2.7
+
+COPY master.sh /
+
+ENV SPARK_MASTER_PORT 17077
+ENV SPARK_MASTER_WEBUI_PORT 18080
+ENV SPARK_MASTER_LOG /spark/logs
+
+EXPOSE 18080 17077 6066
+
+CMD ["/bin/bash", "/master.sh"]
