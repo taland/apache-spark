@@ -10,6 +10,10 @@ host = 'http://localhost:8998'
 
 data = {
     "file": "hdfs://namenode:8020/user/root/main.py",
+    "pyFiles": [
+        "hdfs://namenode:8020/user/root/module0.py",
+        "hdfs://namenode:8020/user/root/module1.py",
+    ],
     "args": [
         "hdfs://namenode:8020/user/root/kw.txt"
     ],

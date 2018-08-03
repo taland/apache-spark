@@ -54,3 +54,7 @@ And the output by adding the /log suffix
 ```bash
 $ curl localhost:8998/batches/0/log
 ```
+
+# TODO
+
+1. Build base image with Python3 and dependencies
