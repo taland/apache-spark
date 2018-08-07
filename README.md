@@ -55,6 +55,15 @@ And the output by adding the /log suffix
 $ curl localhost:8998/batches/0/log
 ```
 
-# TODO
+# Reading data from database
 
-1. Build base image with Python3 and dependencies
+```bash
+/spark/bin/spark-shell --packages org.postgresql:postgresql:42.1.1
+```
+
+```bash
+/spark/bin/spark-submit \
+    --driver-class-path '/root/.ivy2/jars/org.postgresql_postgresql-42.1.1.jar' \
+    --jars '/root/.ivy2/jars/org.postgresql_postgresql-42.1.1.jar' \
+    --conf 'spark.master=spark://spark-master:17077' 'hdfs://namenode:8020/app/read_df_from_db.py'
+```
